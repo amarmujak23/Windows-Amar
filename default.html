@@ -1,0 +1,908 @@
+﻿<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Windows Amar</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="application.css" />
+    <!--<link rel="stylesheet" href="./styles/jquery-ui.css" />-->
+    <style>
+      .popup-window {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        width: 300px;
+        height: 200px;
+        background-color: #fff;
+        border: 1px solid #000;
+        z-index: 1000;
+        display: none;
+        /* Hide by default */
+      }
+
+      .popup-header {
+        background-color: #ccc;
+        cursor: move;
+        padding: 5px;
+        user-select: none;
+      }
+
+      .popup-title {
+        /* Adjust as needed */
+      }
+
+      .popup-controls {
+        float: right;
+      }
+
+      .popup-controls span {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-left: 5px;
+        cursor: pointer;
+        /* Add styling for the minimize, maximize, close icons */
+      }
+
+      .popup-content {
+        padding: 10px;
+      }
+
+
+      /* Minesweeper */
+      #minesweeper {
+        text-align: left;
+        z-index: 99999;
+        display: none;
+      }
+
+      #mine-frame {
+        width: 100%;
+        height: auto;
+        min-height: 250px;
+        resize: both;
+      }
+
+      #minesweeper-content {
+        resize: both;
+      }
+
+      /* File Explorer */
+      #explorer {
+        z-index: 122;
+        display: none;
+        width: 750px;
+      }
+
+      .explorer .title {
+        background: url(./images/win98_icons/directory_open.ico) no-repeat left center;
+        background-size: 16px 16px;
+        padding-left: 20px;
+      }
+
+      .window-border {
+        margin-bottom: 0px;
+      }
+
+      .explorer-top-bar {
+        border: 1px outset #fff;
+        overflow: hidden;
+        display: table;
+      }
+
+      .explorer-top-bar a {
+        display: inline-block;
+        margin: 0 auto;
+        width: 44px;
+        height: 44px;
+        background: no-repeat center left;
+        border: 1px solid #c0c0c0;
+        overflow: hidden;
+      }
+
+      .explorer-top-bar a:hover {
+        border: 1px outset #fff;
+      }
+
+      .explorer-top-bar a:active {
+        border: 1px inset #fff;
+      }
+
+      .explorer-top-bar .b-back {
+        background-image: url(./images/Mail/back.bmp);
+      }
+
+      .explorer-top-bar .b-forward {
+        background-image: url(./images/Mail/forward.bmp);
+      }
+
+      .explorer-top-bar .b-up {
+        background-image: url(./images/Mail/up1.bmp);
+      }
+
+      .explorer-top-bar .b-delete {
+        background-image: url(./images/Mail/delete.bmp);
+      }
+
+      .explorer-top-bar .b-properties {
+        width: 52px;
+        background-image: url(./images/Mail/properties.bmp);
+      }
+
+      .explorer-top-bar .b-send {
+        background-image: url(./images/Mail/send.bmp);
+      }
+
+      .explorer-top-bar .b-cut {
+        background-image: url(./images/Mail/cut.bmp);
+      }
+
+      .explorer-top-bar .b-copy {
+        background-image: url(./images/Mail/copy.bmp);
+      }
+
+      .explorer-top-bar .b-paste {
+        background-image: url(./images/Mail/paste.bmp);
+      }
+
+      .explorer-top-bar .b-undo {
+        background-image: url(./images/Mail/undo.bmp);
+      }
+
+      .explorer-top-bar .b-attach {
+        background-image: url(./images/Mail/attach.bmp);
+      }
+
+      .explorer-top-bar .f-sep {
+        display: inline-block;
+        width: 1px;
+        background: #a5a5a5;
+        height: 44px;
+        border: 1px outset #fff;
+        vertical-align: top;
+        margin: 1px 0 2px 0;
+      }
+
+      .explorer-top-bar .sep {
+        display: inline-block;
+        width: 1px;
+        background: #a5a5a5;
+        height: 44px;
+        border-right: 2px solid #ffffff;
+        border-bottom: 2px solid #ffffff;
+        vertical-align: top;
+        margin: 1px 0 2px 0;
+      }
+
+      .header-info {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      .middle-bar {
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+      }
+
+      .middle-bar p {
+        display: inline-block;
+        margin: 4px 0px 0px 0px;
+      }
+
+      .address {
+        padding-right: 4px;
+      }
+
+      .middle-bar input {
+        display: inline-block;
+        width: 80%;
+        border: 1px solid #000;
+        border-right-color: #fff;
+        border-bottom-color: #fff;
+        background: #fff;
+        box-shadow: -1px -1px 0px 0px #828282;
+        outline: none;
+      }
+
+      .content {
+        background: white;
+        border: 1px solid #000;
+        border-bottom-color: #a3a3a3;
+        border-right-color: #a3a3a3;
+        padding: 1px;
+        overflow: scroll;
+      }
+
+      .document-wrap {
+        outline: none;
+      }
+
+      .left-side {
+        float: left;
+      }
+
+      .sub-header {
+        margin-left: 16px;
+      }
+
+      .explorer-header {
+        font-weight: 700;
+        font-size: 18px;
+        margin: 8px 0px 8px 16px;
+      }
+
+      .explorer-icon {
+        background: url(./images/win98_icons/directory_closed.ico);
+        margin: 16px 0px 0px 16px;
+        background-repeat: no-repeat;
+        background-size: 32px;
+        height: 32px;
+      }
+
+      .underline-header {
+        width: 100%;
+        height: 1px;
+        background: -webkit-linear-gradient(0deg, rgba(255, 0, 0, 1) 0, rgba(255, 0, 0, 1) 24%, rgba(255, 233, 0, 1) 25%, rgba(255, 233, 0, 1) 49%, rgba(0, 255, 17, 1) 50%, rgba(0, 255, 17, 1) 74%, rgba(0, 233, 255, 1) 75%, rgba(0, 233, 255, 1) 100%);
+        background: -moz-linear-gradient(90deg, rgba(255, 0, 0, 1) 0, rgba(255, 0, 0, 1) 24%, rgba(255, 233, 0, 1) 25%, rgba(255, 233, 0, 1) 49%, rgba(0, 255, 17, 1) 50%, rgba(0, 255, 17, 1) 74%, rgba(0, 233, 255, 1) 75%, rgba(0, 233, 255, 1) 100%);
+        background: linear-gradient(90deg, rgba(255, 0, 0, 1) 0, rgba(255, 0, 0, 1) 24%, rgba(255, 233, 0, 1) 25%, rgba(255, 233, 0, 1) 49%, rgba(0, 255, 17, 1) 50%, rgba(0, 255, 17, 1) 74%, rgba(0, 233, 255, 1) 75%, rgba(0, 233, 255, 1) 100%);
+      }
+
+      .red {
+        border: 1px solid red;
+        display: inline-block;
+      }
+
+      .green {
+        border: 1px solid lime;
+        display: inline-block;
+      }
+
+      .yellow {
+        border: 1px solid yellow;
+        display: inline-block;
+      }
+
+      .blue {
+        border: 1px solid aqua;
+        display: inline-block;
+      }
+
+      .left-side {
+        background-image: url(./images/explorercorner.jpg);
+        background-repeat: no-repeat;
+        width: 30%;
+        display: inline-block;
+      }
+
+      .right-side {
+        width: 69%;
+        display: inline-block;
+      }
+
+      .folder-icon {
+        display: inline-block;
+        width: 68px;
+        text-align: center;
+        margin-top: 4px;
+        background-size: 32px !important;
+        vertical-align: top;
+      }
+
+      .folder-icon:active {
+        cursor: default;
+      }
+
+      .folder-icon:focus {
+        outline: none;
+        cursor: default;
+      }
+
+      .text {
+        cursor: default;
+        font-size: 12px;
+        position: relative;
+        margin: 34px 0 0 0px;
+        color: #000000;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .active {
+        overflow-y: visible;
+        word-break: break-word;
+        width: auto;
+        color: #ffffff;
+      }
+
+      .active span {
+        background: blue;
+      }
+
+      .active p {
+        text-align: center;
+      }
+
+      /* Status bar */
+      .status-bar {
+        margin-top: 5px;
+        border-top: 1px solid #848484;
+        background: url("./images/window/status-bar-grip.png") no-repeat right bottom;
+      }
+
+      .status-bar-content {
+        border-top: 1px solid #fff;
+        padding: 0px 0px 0px 0px;
+      }
+
+      .status-bar .box {
+        height: 23px;
+        display: inline-block;
+        border: 1px inset #fff;
+        padding: 0px 0px;
+        margin-right: 0px;
+        vertical-align: top;
+      }
+
+      .status-bar .box.disabled {
+        color: #848484;
+      }
+
+      .status-folder-icon {
+        width: 16px;
+        height: 16px;
+        margin: 0px 2px;
+        vertical-align: middle;
+      }
+
+      /* Draggable GIF */
+      #draggable-gif {
+        position: absolute;
+        top: 20px;
+        left: 100px;
+        z-index: 1000;
+        width: 300px;
+        height: auto;
+      }
+
+      #draggable-gif-2 img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      #draggable-gif-2 {
+        position: absolute;
+        top: 500px;
+        right: 90px;
+        z-index: 1000;
+        width: 300px;
+        height: auto;
+      }
+
+      #draggable-gif img {
+        max-width: 100%;
+        height: auto;
+      }
+
+    </style>
+    <script>
+      function startTime() {
+        var today = new Date();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var p = " AM";
+        p = getPeriod(h, p);
+        m = checkTime(m);
+        h = formatTime(h);
+        document.getElementById('clock').innerHTML =
+          h + ":" + m + p;
+        var t = setTimeout(startTime, 500);
+      }
+
+      function checkTime(i) {
+        if (i < 10) {
+          i = "0" + i
+        };
+        return i;
+      }
+
+      function formatTime(t) {
+        if (t > 12) {
+          t = (t - 12);
+          return t;
+        } else {
+          return t;
+        }
+      }
+
+      function getPeriod(hr, pd) {
+        if (hr > 12) {
+          pd = " PM";
+          return pd;
+        } else {
+          pd = " AM";
+          return pd;
+        }
+      }
+
+    </script>
+  </head>
+
+  <body onload="startTime()">
+    <div id="desktop">
+      <div class="sun"></div>
+      <div class="overlay"></div>
+      <div class="overlay glitch"></div>
+
+    </div>
+    </div>
+    <!-- Updated div with the draggable GIF -->
+    <div id="draggable-gif" class="draggable-element">
+      <img src="./images/giphy.gif" alt="GIF" /> 
+    </div>
+    </div>
+
+   
+
+    <div id="draggable-gif-2" class="draggable-element">
+      <img src="./images/giphy_2.gif" class="draggable-element" />
+    </div>
+
+   
+   
+    <audio id="audioPlayer" controls autoplay>
+      <source src="./assets/music.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+      const audio = document.getElementById('audioPlayer');
+    
+    
+      audio.volume = 0.5; 
+    
+      window.onload = function() {
+        audio.volume = 0.5; 
+        audio.play(); 
+      };
+    </script>
+  </script>
+  
+    <!-- My Computer -->
+    <div class="application" onclick="openApplication('myComputer', 'explorer-task')">
+      <img src="./images/computer_explorer.ico" class="application-icon" />
+      <div class="application-title">
+        My Computer
+      </div>
+    </div>
+
+    <!-- Explorer Application Window -->
+    <div id="myComputer" class="explorer window active-window application-window" program-name="explorer" pid="3" directory="My Computer">
+      <div class="window-border">
+        <div class="title-bar ui-draggable-handle" id="parent">
+          <div class="control-box">
+            <a class="button-3d minimize" onclick="toggleActive('explorer-task', 'myComputer')"><span>&nbsp;</span></a>
+            <a class="button-3d maximize" onclick="fullscreen('myComputer')" state="min"><span>&nbsp;</span></a>
+            <a class="button-3d close" onclick="closeApplication('myComputer', 'explorer-task')"><span>&nbsp;</span></a>
+          </div>
+          <span class="title">My Computer</span>
+        </div>
+        <div class="top">
+          <div class="os-summary">
+            <h2><strong>System Information</strong></h2>
+            <p><strong>Operating System:</strong> Microsoft Windows Amar</p>
+            <p><strong>Version:</strong> Windows Amar (Version 4.0 Build 950)</p>
+            <!-- Include more details about the operating system -->
+            <!-- You can add information like system architecture, features, release date, etc. -->
+            <p><strong>System Architecture:</strong> 32-bit</p>
+            <p><strong>Release Date:</strong> August 24, 1995</p>
+            <!-- Add more relevant details based on the Windows version -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <script>
+      function openPopup(id) {
+        var popup = document.getElementById(id);
+        if (popup) {
+          popup.style.display = "block";
+        }
+      }
+
+      function closePopup(id) {
+        var popup = document.getElementById(id);
+        if (popup) {
+          popup.style.display = "none";
+        }
+      }
+
+    </script>
+
+    <!-- documents -->
+    <div class="application" onclick="openApplication('explorer', 'explorer-task')">
+      <img src="./images/directory_open_file_mydocs.ico" class="application-icon" />
+      <div class="application-title">
+        Documents
+      </div>
+    </div>
+
+    <!-- Minesweeper -->
+    <div id="minesweeper-desktop-app" class="application" onclick="openApplication('minesweeper', 'minesweeper-task')">
+      <!--  onclick="openApplication('minesweeper', 'minesweeper-task')" -->
+      <img src="./images/minesweeper.ico" class="application-icon" />
+      <div class="application-title">
+        Minesweeper
+      </div>
+    </div>
+    <!-- Minesweeper Application Window -->
+    <div id="minesweeper" class="window active-window application-window" program-name="minesweeper" pid="1">
+      <!--  ui-widget-content ui-draggableui-widget-content ui-draggable  -->
+      <div class="window-border">
+        <div class="title-bar h-count ui-draggable-handle" id="parent">
+          <img class="icon" src="./images/minesweeper.ico" />
+          <div class="control-box">
+            <a class="button-3d minimize" onclick="toggleActive('minesweeper-task', 'minesweeper')"><span>&nbsp;</span></a>
+            <a class="button-3d maximize" onclick="fullscreen('minesweeper')"><span>&nbsp;</span></a>
+            <a class="button-3d close" onclick="closeApplication('minesweeper', 'minesweeper-task')"><span>&nbsp;</span></a>
+          </div>
+          <span class="title">Minesweeper</span>
+        </div>
+        <div class="clear"></div>
+        <div id="minesweeper-content">
+          <!--<iframe src="http://minesweeper.tenmore.solutions/" id="mine-frame" scrolling="no"></iframe>-->
+          <!-- width="270" height="375" -->
+          <iframe src="./minesweeper/minesweeper.html" id="mine-frame" scrolling="no"></iframe>
+        </div>
+      </div>
+    </div>
+    <!-- Explorer Application Window -->
+    <div id="explorer" class="explorer window active-window application-window" program-name="explorer" pid="3" directory="Desktop/My Projects">
+      <!--  ui-widget-content ui-draggable ui-resizable -->
+      <div class="window-border">
+        <div class="title-bar ui-draggable-handle" id="parent">
+          <div class="control-box">
+            <a class="button-3d minimize" onclick="toggleActive('explorer-task', 'explorer')"><span>&nbsp;</span></a>
+            <a class="button-3d maximize" onclick="fullscreen('explorer')" state="min"><span>&nbsp;</span></a>
+            <a class="button-3d close" onclick="closeApplication('explorer', 'explorer-task')"><span>&nbsp;</span></a>
+          </div>
+          <span class="title">File Explorer</span>
+        </div>
+        <div class="top">
+          <div class="menu-bar  h-count">
+            <span class="f-sep"></span>
+            <a><span>F</span>ile</a>
+            <a><span>E</span>dit</a>
+            <a><span>V</span>iew</a>
+            <a><span>G</span>o</a>
+            <a>F<span>a</span>vourites</a>
+            <a><span>H</span>elp</a>
+            <div class="clear"></div>
+          </div>
+          <span class="hr-sep"></span>
+          <div class="clear"></div>
+        </div>
+        <div class="explorer-top-bar">
+          <a class="b-back"></a>
+          <a class="b-forward"></a>
+          <a class="b-up"></a>
+          <span class="sep"></span>
+          <a class="b-cut"></a>
+          <a class="b-copy"></a>
+          <a class="b-paste"></a>
+          <a class="b-undo"></a>
+          <span class="sep"></span>
+          <a class="b-delete"></a>
+          <a class="b-properties"></a>
+        </div>
+        <div class="header-info">
+          <div class="middle-bar">
+            <p class="to">Address:</p>
+            <input type="text" id="address-bar" value="My Documents">
+          </div>
+        </div>
+        <div id="explorer-content" class="content">
+          <div class="left-side">
+            <div class="explorer-icon"></div>
+            <div class="explorer-header">My Documents</div>
+            <div class="underline-header">
+              <!-- <div class="red"></div>
+                    <div class="yellow"></div>
+                    <div class="green"></div>
+                    <div class="blue"></div> -->
+            </div>
+            <br>
+            <div class="sub-header">Select an item</div>
+          </div>
+          <div class="right-side">
+            <div class="folder-location">
+              <div class="folder-url folder-icon" directory="root" tabindex="0" style="background:url(images/win98_icons/msie2.ico) no-repeat center top;" onclick="window.open('https://github.com/amarmujak23')">
+                <p class="text"><span>Github</span></p>
+              </div>
+              <div class="folder-url folder-icon" directory="root" tabindex="0" style="background:url(images/win98_icons/msie2.ico) no-repeat center top;" onclick="window.open('https://www.linkedin.com/in/mujakamar/')">
+                <p class="text"><span>LinkedIn</span></p>
+              </div>
+              <div class="folder-icon user-file" tabindex="0" fileid="file-0000000000001" program-name="msword" type="undefined" style="background:url(./images/win98_icons/WINWORD_2.ico) no-repeat center top;background-size: 32px; ">
+                <a href="https://amarmujak.dev" target="_blank">
+                  <p class="text" style="text-align:center;"><span>My Portfolio</span></p>
+                </a>
+              </div>
+
+            </div>
+          </div>
+          <div class="status-bar h-count" id="status-bar-1">
+            <div class="status-bar-content">
+              <span class="box" style="width:20%"></span>
+              <span class="box size" style="width:50%"></span>
+              <span class="box" style="width:25%">
+                <img class="status-folder-icon" src="images/win98_icons/directory_open.ico">
+                My Documents
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div>
+        <div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div>
+        <div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div>
+      </div>
+    </div>
+    <div id="taskbar">
+      <!-- Start Button -->
+      <div id="start-button" onclick="showItem('start-menu')">
+        <img src="./images/windows.ico" id="windows-icon" />
+        <div id="start-button-text">Start</div>
+      </div>
+      <!-- Open Applications in the Taskbar -->
+      <div id="task-container">
+        <!-- Minesweeper -->
+        <div id="minesweeper-task" class="task active-task" onclick="toggleActive('minesweeper-task', 'minesweeper')">
+          <img class="task-icon" src="./images/minesweeper.ico" />
+          <div class="task-text">
+            Minesweeper
+          </div>
+        </div>
+        <style>
+          #notification-tray {
+            display: flex;
+            align-items: center;
+          }
+          #volume-icon {
+            width: 30px; /* Adjust as needed */
+            height: 30px; /* Adjust as needed */
+            margin-right: 10px; /* Adjust as needed */
+          }
+        </style>
+      </head>
+      <body>
+        <div id="notification-tray">
+          <div id="clock"></div>
+        </div>
+      
+        <script>
+          function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('clock').textContent = timeString;
+          }
+      
+          // Update the clock every second
+          setInterval(updateClock, 1000);
+      
+          // Initial call to display the clock immediately
+          updateClock();
+        </script>
+      </body>
+      <div id="start-menu">
+        <div id="system-name" style="font-weight: bold;">Windows Amar</div>
+        <div id="start-menu-button-container">
+          <!-- Programs -->
+          <div id="programs" class="start-menu-button">
+            <img src="./images/directory_program_group_small.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Programs</div>
+            <div class="arrow">▸</div>
+            <div id="programs-submenu" class="submenu">
+              <div class="submenu-option">
+                <div class="text">Minesweeper</div>
+              </div>
+            </div>
+          </div>
+          <!-- Favorites -->
+          <div class="start-menu-button">
+            <img src="./images/directory_favorites_small.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Favorites</div>
+          </div>
+          <!-- Documents -->
+          <div class="start-menu-button">
+            <img src="./images/directory_open_file_mydocs.ico" class="start-menu-button-icon" style="width:26px; margin-left:5px; margin-right:4px;" />
+            <div class="start-menu-button-label" style="margin-top:8px;">Documents</div>
+          </div>
+          <!-- Find -->
+          <div class="start-menu-button">
+            <img src="./images/search_file_2.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Find</div>
+          </div>
+          <!-- Run -->
+          <div class="start-menu-button">
+            <img src="./images/application_hourglass_small.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Run</div>
+          </div>
+          <!-- Help -->
+          <div class="start-menu-button">
+            <img src="./images/help_book_small.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Help</div>
+          </div>
+          <!-- Log Off -->
+          <div class="start-menu-button">
+            <img src="./images/key_win.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Log Off</div>
+          </div>
+          <!-- Shut Down -->
+          <div class="start-menu-button">
+            <img src="./images/shut_down_cool.ico" class="start-menu-button-icon" />
+            <div class="start-menu-button-label">Shut Down</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        dragElement(document.getElementById(("minesweeper")));
+
+        function dragElement(elmnt) {
+          var pos1 = 0,
+            pos2 = 0,
+            pos3 = 0,
+            pos4 = 0;
+          if (document.getElementById(elmnt.id + "header")) {
+            /* if present, the header is where you move the DIV from:*/
+            document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+          } else {
+            /* otherwise, move the DIV from anywhere inside the DIV:*/
+            elmnt.onmousedown = dragMouseDown;
+          }
+
+          function dragMouseDown(e) {
+            e = e || window.event;
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+          }
+
+          function elementDrag(e) {
+            e = e || window.event;
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+          }
+
+          function closeDragElement() {
+            /* stop moving when mouse button is released:*/
+            document.onmouseup = null;
+            document.onmousemove = null;
+          }
+        }
+
+      </script>
+      <script>
+        //document.getElementById('minesweeper-desktop-app').onclick = openApplication('minesweeper', 'minesweeper-task');
+        function fullscreen(id) {
+          var h = document.getElementById("desktop").offsetHeight;
+          var w = document.getElementById("desktop").offsetWidth;
+          item = document.getElementById(id);
+          if (item.classList.contains('application-fullscreen')) {
+            item.classList.remove('application-fullscreen');
+            if (id == 'minesweeper') {
+              item.style.top = "73.4px";
+              item.style.left = "512px";
+              item.style.height = "440.4px";
+              document.getElementById("minesweeper-content").style.height = "auto";
+              document.getElementById("minesweeper-content").style.width = "auto";
+            } else if (id == 'explorer') {
+              document.getElementById("explorer-content").style.height = "auto";
+              document.getElementById("explorer-content").style.width = "auto";
+            }
+          } else {
+            item.classList.add('application-fullscreen');
+            if (id == 'minesweeper') {
+              document.getElementById("minesweeper-content").style.height = h + "px";
+              document.getElementById("minesweeper-content").style.width = w + "px";
+            } else if (id == 'explorer') {
+              document.getElementById("explorer-content").style.height = h + "px";
+              document.getElementById("explorer-content").style.width = w + "px";
+            }
+          }
+        }
+
+        function showItem(id) {
+          item = document.getElementById(id);
+          if (item.style.display == 'none') {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        }
+
+        function showInlineItem(id) {
+          item = document.getElementById(id);
+          if (item.style.display == 'none') {
+            item.style.display = 'inline-block';
+          } else if (item.style.display == ' inline-block') {
+            item.style.display = 'none';
+          } else {
+            item.style.display = 'none';
+          }
+        }
+
+        function toggleActive(task, window) {
+          item = document.getElementById(task);
+          if (item.classList.contains('active-task')) {
+            item.classList.remove('active-task');
+          } else {
+            item.classList.add('active-task');
+          }
+          showItem(window);
+        }
+
+        function openApplication(window, task) {
+          showItem(window);
+          showInlineItem(task);
+          toggleActive(task);
+        }
+
+        function closeApplication(window, task) {
+          showItem(window);
+          showInlineItem(task);
+        }
+
+      </script>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          // For the first draggable GIF
+          dragElement(document.getElementById('draggable-gif'));
+
+          // For the second draggable GIF
+          dragElement(document.getElementById('draggable-gif-2'));
+
+          // Drag function for the GIFs
+          function dragElement(elmnt) {
+            var isDragging = false;
+            var offsetX, offsetY;
+
+            elmnt.onmousedown = function(e) {
+              isDragging = true;
+              offsetX = e.clientX - elmnt.getBoundingClientRect().left;
+              offsetY = e.clientY - elmnt.getBoundingClientRect().top;
+            };
+
+            document.addEventListener('mousemove', function(e) {
+              if (isDragging) {
+                elmnt.style.left = (e.clientX - offsetX) + 'px';
+                elmnt.style.top = (e.clientY - offsetY) + 'px';
+              }
+            });
+
+            document.addEventListener('mouseup', function() {
+              isDragging = false;
+            });
+          }
+        });
+
+      </script>
+  </body>
+
+</html>
